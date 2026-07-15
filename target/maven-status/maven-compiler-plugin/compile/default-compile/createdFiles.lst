@@ -1,0 +1,5 @@
+view\NeueUntersuchung.class
+view\Lager.class
+controller\NavigationsController.class
+application\Hauptprogramm.class
+view\Startseite.class

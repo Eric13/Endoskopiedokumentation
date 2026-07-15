@@ -1,0 +1,136 @@
+.root {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-background-color: #f4f7fb;
+    -fx-font-size: 14px;
+}
+
+/* Kopfbereich */
+.kopfbereich {
+    -fx-background-color: white;
+    -fx-padding: 18 22 18 22;
+    -fx-border-color: transparent transparent #d8e1ec transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
+}
+
+/* Hauptüberschrift */
+.ueberschrift {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #173b63;
+}
+
+/* Normale Buttons */
+.button {
+    -fx-background-color: white;
+    -fx-text-fill: #173b63;
+    -fx-border-color: #b8c9dc;
+    -fx-border-radius: 7;
+    -fx-background-radius: 7;
+    -fx-padding: 9 16 9 16;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #eaf2fb;
+}
+
+/* Blauer Hauptbutton */
+.hauptbutton {
+    -fx-background-color: #2468a2;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-border-color: transparent;
+}
+
+.hauptbutton:hover {
+    -fx-background-color: #1d5789;
+}
+
+/* Grüner Button */
+.erfolgsbutton {
+    -fx-background-color: #2e8b57;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-border-color: transparent;
+}
+
+.erfolgsbutton:hover {
+    -fx-background-color: #247247;
+}
+
+/* Eingabefelder */
+.text-field,
+.combo-box,
+.date-picker,
+.spinner {
+    -fx-background-color: white;
+    -fx-border-color: #c7d3df;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 6;
+}
+
+.text-field:focused,
+.combo-box:focused,
+.date-picker:focused,
+.spinner:focused {
+    -fx-border-color: #2468a2;
+}
+
+/* Tabellen */
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #d7e0ea;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #eaf2fb;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-padding: 10;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #173b63;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #edf1f5 transparent;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #f2f7fc;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #dcecf9;
+    -fx-text-background-color: #173b63;
+}
+
+/* Formularkarte */
+.formular-karte {
+    -fx-background-color: white;
+    -fx-padding: 25;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #dce4ed;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.06), 10, 0, 0, 3);
+}
+
+/* Statusfarben für Sprint 3 */
+.status-ok {
+    -fx-background-color: #dff4e8;
+    -fx-text-fill: #1f6b43;
+}
+
+.status-warnung {
+    -fx-background-color: #ffe4e4;
+    -fx-text-fill: #9b1c1c;
+}
