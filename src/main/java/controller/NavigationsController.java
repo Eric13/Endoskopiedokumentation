@@ -1,5 +1,7 @@
 package controller;
 
+import javafx.application.Platform;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import view.Lager;
@@ -7,59 +9,87 @@ import view.NeueUntersuchung;
 import view.Startseite;
 
 /**
- * Steuert die Navigation zwischen den drei Ansichten.
+ * Steuert die Navigation zwischen den Ansichten.
  *
- * Es wird immer dasselbe Hauptfenster verwendet.
- * Beim Seitenwechsel wird nur die Scene ausgetauscht.
+ * Während der gesamten Laufzeit werden nur ein Stage
+ * und eine Scene verwendet. Beim Seitenwechsel wird
+ * lediglich das Root-Element der Scene ausgetauscht.
+ *
+ * Dadurch bleibt das Fenster beim Wechsel zwischen
+ * den Seiten maximiert.
  */
 public class NavigationsController {
 
     /*
-     * Ein einziges Hauptfenster für die komplette Anwendung.
+     * Gemeinsames Hauptfenster.
      */
     private final Stage hauptFenster;
+
+    /*
+     * Gemeinsame Scene für alle Ansichten.
+     */
+    private final Scene hauptScene;
 
     /**
      * Konstruktor.
      *
-     * @param hauptFenster Hauptfenster der JavaFX-Anwendung
+     * @param hauptFenster gemeinsames JavaFX-Fenster
      */
     public NavigationsController(Stage hauptFenster) {
 
         this.hauptFenster = hauptFenster;
 
         /*
-         * Gemeinsame Einstellungen für alle Seiten.
+         * Für die Erzeugung der Scene wird zunächst
+         * eine Startseitenansicht verwendet.
          */
-        this.hauptFenster.setTitle(
+        Startseite vorlaeufigeStartseite =
+                new Startseite();
+
+        /*
+         * Die Scene wird nur einmal erzeugt.
+         */
+        hauptScene = new Scene(
+                vorlaeufigeStartseite.getAnsicht()
+        );
+
+        /*
+         * Zentrale CSS-Datei laden.
+         */
+        ladeDesign();
+
+        /*
+         * Allgemeine Fenstereinstellungen.
+         */
+        hauptFenster.setTitle(
                 "Endoskopie-Dokumentation"
         );
 
         /*
-         * Fenster darf nicht kleiner als diese Werte werden.
+         * Verhindert ein zu kleines Fenster.
          */
-        this.hauptFenster.setMinWidth(1000);
-        this.hauptFenster.setMinHeight(700);
+        hauptFenster.setMinWidth(900);
+        hauptFenster.setMinHeight(600);
 
         /*
-         * Anwendung immer maximiert öffnen.
+         * Die gemeinsame Scene wird einmalig gesetzt.
          */
-        this.hauptFenster.setMaximized(true);
+        hauptFenster.setScene(hauptScene);
     }
 
     /**
-     * Lädt das gemeinsame CSS-Design.
+     * Lädt die zentrale CSS-Datei.
      */
-    private void ladeDesign(Scene scene) {
+    private void ladeDesign() {
 
         var cssDatei =
                 getClass().getResource("/design.css");
 
         if (cssDatei != null) {
 
-            scene.getStylesheets().add(
-                    cssDatei.toExternalForm()
-            );
+            hauptScene
+                    .getStylesheets()
+                    .add(cssDatei.toExternalForm());
 
         } else {
 
@@ -70,33 +100,29 @@ public class NavigationsController {
     }
 
     /**
-     * Zeigt eine Scene im Hauptfenster an.
+     * Ersetzt den Inhalt der bestehenden Scene.
      *
-     * Diese Hilfsmethode stellt sicher,
-     * dass jede Seite maximiert angezeigt wird.
+     * Stage und Scene bleiben erhalten.
+     *
+     * @param ansicht neue Benutzeroberfläche
      */
-    private void zeigeScene(Scene scene) {
-
-        ladeDesign(scene);
+    private void zeigeAnsicht(Parent ansicht) {
 
         /*
-         * Neue Scene in dasselbe Fenster einsetzen.
+         * Nur der Inhalt der Scene wird ausgetauscht.
          */
-        hauptFenster.setScene(scene);
+        hauptScene.setRoot(ansicht);
 
         /*
-         * Fenster anzeigen.
+         * Maximierung nach dem Seitenwechsel absichern.
          */
-        hauptFenster.show();
-
-        /*
-         * Nach jedem Seitenwechsel erneut maximieren.
-         */
-        hauptFenster.setMaximized(true);
+        Platform.runLater(
+                () -> hauptFenster.setMaximized(true)
+        );
     }
 
     /**
-     * Öffnet die Startseite.
+     * Zeigt die Startseite.
      */
     public void zeigeStartseite() {
 
@@ -113,7 +139,7 @@ public class NavigationsController {
                 );
 
         /*
-         * Navigation zur neuen Untersuchung.
+         * Navigation zur Seite "Neue Untersuchung".
          */
         startseite
                 .getNeueUntersuchungButton()
@@ -122,19 +148,29 @@ public class NavigationsController {
                                 zeigeNeueUntersuchung()
                 );
 
-        /*
-         * Keine feste Fenstergröße angeben.
-         */
-        Scene scene =
-                new Scene(
-                        startseite.getAnsicht()
-                );
+        zeigeAnsicht(
+                startseite.getAnsicht()
+        );
 
-        zeigeScene(scene);
+        /*
+         * Das Fenster wird nur beim ersten Aufruf angezeigt.
+         */
+        if (!hauptFenster.isShowing()) {
+
+            hauptFenster.show();
+
+            /*
+             * Unter Windows funktioniert das Maximieren
+             * nach show() zuverlässiger.
+             */
+            Platform.runLater(
+                    () -> hauptFenster.setMaximized(true)
+            );
+        }
     }
 
     /**
-     * Öffnet die Seite "Neue Untersuchung".
+     * Zeigt die Eingabeseite für eine neue Untersuchung.
      */
     public void zeigeNeueUntersuchung() {
 
@@ -152,18 +188,81 @@ public class NavigationsController {
                 );
 
         /*
-         * Keine feste Fenstergröße verwenden.
+         * Vorläufige Bedienfunktion:
+         * ausgewähltes Material in die Liste übernehmen.
+         *
+         * Die eigentliche Controller- und Datenbanklogik
+         * wird später ergänzt.
          */
-        Scene scene =
-                new Scene(
-                        neueUntersuchung.getAnsicht()
+        neueUntersuchung
+                .getMaterialHinzufuegenButton()
+                .setOnAction(
+                        ereignis -> {
+
+                            String material =
+                                    neueUntersuchung
+                                            .getMaterialAuswahl()
+                                            .getValue();
+
+                            int menge =
+                                    neueUntersuchung
+                                            .getMengenAuswahl()
+                                            .getValue();
+
+                            if (material != null) {
+
+                                neueUntersuchung
+                                        .getMaterialListe()
+                                        .getItems()
+                                        .add(
+                                                material
+                                                        + " – Menge: "
+                                                        + menge
+                                        );
+
+                                neueUntersuchung
+                                        .getMaterialAuswahl()
+                                        .setValue(null);
+
+                                neueUntersuchung
+                                        .getMengenAuswahl()
+                                        .getValueFactory()
+                                        .setValue(1);
+                            }
+                        }
                 );
 
-        zeigeScene(scene);
+        /*
+         * Markierten Materialeintrag entfernen.
+         */
+        neueUntersuchung
+                .getMaterialEntfernenButton()
+                .setOnAction(
+                        ereignis -> {
+
+                            String ausgewaehlt =
+                                    neueUntersuchung
+                                            .getMaterialListe()
+                                            .getSelectionModel()
+                                            .getSelectedItem();
+
+                            if (ausgewaehlt != null) {
+
+                                neueUntersuchung
+                                        .getMaterialListe()
+                                        .getItems()
+                                        .remove(ausgewaehlt);
+                            }
+                        }
+                );
+
+        zeigeAnsicht(
+                neueUntersuchung.getAnsicht()
+        );
     }
 
     /**
-     * Öffnet die Lagerseite.
+     * Zeigt die Lagerübersicht.
      */
     public void zeigeLager() {
 
@@ -180,14 +279,8 @@ public class NavigationsController {
                                 zeigeStartseite()
                 );
 
-        /*
-         * Keine feste Fenstergröße verwenden.
-         */
-        Scene scene =
-                new Scene(
-                        lager.getAnsicht()
-                );
-
-        zeigeScene(scene);
+        zeigeAnsicht(
+                lager.getAnsicht()
+        );
     }
 }

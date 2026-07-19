@@ -11,222 +11,250 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 
 /**
- * Benutzeroberfläche der Lagerverwaltung.
+ * Benutzeroberfläche der Lagerübersicht.
  *
- * Aufgabe:
- * - Übersicht aller Materialien
- * - Anzeige des Lagerbestandes
- * - Vorbereitung für Sprint 3
+ * Sprint 2:
+ * - responsive Oberfläche,
+ * - Tabellenstruktur,
+ * - Navigation.
  *
- * Diese Klasse enthält keine Geschäftslogik.
+ * Sprint 3:
+ * - Bestandsberechnung,
+ * - Restbestand,
+ * - Warnfunktion.
  */
 public class Lager {
 
     /*
      * Hauptlayout.
      */
-    private BorderPane hauptLayout;
+    private final BorderPane hauptLayout;
 
     /*
-     * Zurück Button.
+     * Zurück-Button.
      */
-    private Button zurueckButton;
+    private final Button zurueckButton;
 
     /*
-     * Tabelle.
+     * Lagertabelle.
      */
-    private TableView<Object> lagerTabelle;
+    private final TableView<Object> lagerTabelle;
 
     /**
-     * Konstruktor.
+     * Konstruktor erstellt die vollständige Lageransicht.
      */
     public Lager() {
 
-        erstelleOberflaeche();
-
-    }
-
-    /**
-     * Erstellt die komplette Oberfläche.
-     */
-    private void erstelleOberflaeche() {
-
-        //----------------------------------------
-        // Hauptlayout
-        //----------------------------------------
-
+        /*
+         * Hauptlayout.
+         */
         hauptLayout = new BorderPane();
 
-        hauptLayout.setPadding(
-                new Insets(20)
-        );
+        /*
+         * Kopfbereich.
+         */
+        HBox kopfbereich = new HBox(12);
+        kopfbereich.setAlignment(Pos.CENTER_LEFT);
+        kopfbereich.getStyleClass().add("kopfbereich");
 
-        //----------------------------------------
-        // Überschrift
-        //----------------------------------------
-
+        /*
+         * Überschrift.
+         */
         Label ueberschrift =
                 new Label("Lagerverwaltung");
 
-        ueberschrift.setStyle(
+        ueberschrift
+                .getStyleClass()
+                .add("ueberschrift");
 
-                "-fx-font-size:26px;" +
+        /*
+         * Untertitel.
+         */
+        Label untertitel =
+                new Label(
+                        "Übersicht der Verbrauchsmaterialien und Lagerbestände"
+                );
 
-                "-fx-font-weight:bold;"
+        untertitel
+                .getStyleClass()
+                .add("untertitel");
 
-        );
+        /*
+         * Titelbereich.
+         */
+        VBox titelBereich =
+                new VBox(
+                        3,
+                        ueberschrift,
+                        untertitel
+                );
 
-        //----------------------------------------
-        // Abstand
-        //----------------------------------------
-
-        Region abstand =
-                new Region();
+        /*
+         * Flexibler Abstand.
+         */
+        Region abstand = new Region();
 
         HBox.setHgrow(
                 abstand,
                 Priority.ALWAYS
         );
 
-        //----------------------------------------
-        // Zurück Button
-        //----------------------------------------
-
+        /*
+         * Zurück-Button.
+         */
         zurueckButton =
                 new Button("Zurück");
 
-        //----------------------------------------
-        // Kopfbereich
-        //----------------------------------------
-
-        HBox kopfbereich =
-                new HBox(
-
-                        10,
-
-                        ueberschrift,
-
-                        abstand,
-
-                        zurueckButton
-
-                );
-
-        kopfbereich.setAlignment(
-                Pos.CENTER_LEFT
+        kopfbereich.getChildren().addAll(
+                titelBereich,
+                abstand,
+                zurueckButton
         );
 
-        //----------------------------------------
-        // Tabelle
-        //----------------------------------------
-
+        /*
+         * Lagertabelle.
+         */
         lagerTabelle =
                 new TableView<>();
 
-        lagerTabelle.setColumnResizePolicy(
-
-                TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS
-
+        lagerTabelle.setMaxWidth(
+                Double.MAX_VALUE
         );
 
-        //----------------------------------------
-        // Spalten
-        //----------------------------------------
-
-        TableColumn<Object,String> artikelnummer =
-                new TableColumn<>("Artikelnummer");
-
-        TableColumn<Object,String> bezeichnung =
-                new TableColumn<>("Bezeichnung");
-
-        TableColumn<Object,Integer> bestand =
-                new TableColumn<>("Bestand");
-
-        TableColumn<Object,Integer> mindestbestand =
-                new TableColumn<>("Mindestbestand");
-
-        TableColumn<Object,String> status =
-                new TableColumn<>("Status");
-
-        //----------------------------------------
-        // Spalten hinzufügen
-        //----------------------------------------
-
-        lagerTabelle.getColumns().addAll(
-
-                artikelnummer,
-
-                bezeichnung,
-
-                bestand,
-
-                mindestbestand,
-
-                status
-
+        lagerTabelle.setMaxHeight(
+                Double.MAX_VALUE
         );
-
-        //----------------------------------------
-        // Platzhalter
-        //----------------------------------------
 
         lagerTabelle.setPlaceholder(
-
                 new Label(
                         "Noch keine Lagerdaten vorhanden."
                 )
-
         );
 
-        //----------------------------------------
-        // Layout zusammensetzen
-        //----------------------------------------
-
-        hauptLayout.setTop(
-                kopfbereich
+        /*
+         * Spalten passen sich an die Fensterbreite an.
+         */
+        lagerTabelle.setColumnResizePolicy(
+                TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );
 
-        hauptLayout.setCenter(
-                lagerTabelle
+        /*
+         * Spalte: Artikelnummer.
+         */
+        TableColumn<Object, String> artikelnummerSpalte =
+                new TableColumn<>("Artikelnummer");
+
+        artikelnummerSpalte.setPrefWidth(180);
+
+        /*
+         * Spalte: Bezeichnung.
+         */
+        TableColumn<Object, String> bezeichnungSpalte =
+                new TableColumn<>("Bezeichnung");
+
+        bezeichnungSpalte.setPrefWidth(350);
+
+        /*
+         * Spalte: aktueller Bestand.
+         */
+        TableColumn<Object, Number> bestandSpalte =
+                new TableColumn<>("Bestand");
+
+        bestandSpalte.setPrefWidth(150);
+
+        /*
+         * Spalte: Mindestbestand.
+         */
+        TableColumn<Object, Number> mindestbestandSpalte =
+                new TableColumn<>("Mindestbestand");
+
+        mindestbestandSpalte.setPrefWidth(180);
+
+        /*
+         * Spalte: Status.
+         *
+         * Wird später für "OK" beziehungsweise
+         * "Nachbestellen" verwendet.
+         */
+        TableColumn<Object, String> statusSpalte =
+                new TableColumn<>("Status");
+
+        statusSpalte.setPrefWidth(200);
+
+        /*
+         * Spalten hinzufügen.
+         */
+        lagerTabelle.getColumns().addAll(
+                artikelnummerSpalte,
+                bezeichnungSpalte,
+                bestandSpalte,
+                mindestbestandSpalte,
+                statusSpalte
         );
 
-        BorderPane.setMargin(
+        /*
+         * Abschnittsüberschrift.
+         */
+        Label tabellenTitel =
+                new Label("Materialbestand");
 
+        tabellenTitel
+                .getStyleClass()
+                .add("abschnittsueberschrift");
+
+        /*
+         * Inhaltsbereich.
+         */
+        VBox inhaltsBereich =
+                new VBox(
+                        15,
+                        tabellenTitel,
+                        lagerTabelle
+                );
+
+        inhaltsBereich.setPadding(
+                new Insets(24)
+        );
+
+        inhaltsBereich.setFillWidth(true);
+
+        /*
+         * Tabelle füllt den übrigen Bildschirmbereich.
+         */
+        VBox.setVgrow(
                 lagerTabelle,
-
-                new Insets(20,0,0,0)
-
+                Priority.ALWAYS
         );
 
+        /*
+         * Layout zusammensetzen.
+         */
+        hauptLayout.setTop(kopfbereich);
+        hauptLayout.setCenter(inhaltsBereich);
     }
 
     /**
-     * Gibt die Oberfläche zurück.
+     * Gibt die vollständige Ansicht zurück.
      */
     public Parent getAnsicht() {
-
         return hauptLayout;
-
     }
 
     /**
-     * Getter für den Zurück Button.
+     * Gibt den Zurück-Button zurück.
      */
     public Button getZurueckButton() {
-
         return zurueckButton;
-
     }
 
     /**
-     * Getter für die Tabelle.
+     * Gibt die Lagertabelle zurück.
      */
     public TableView<Object> getLagerTabelle() {
-
         return lagerTabelle;
-
     }
-
 }
+

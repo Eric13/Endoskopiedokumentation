@@ -14,15 +14,14 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 /**
- * Moderne Benutzeroberfläche der Startseite.
+ * Benutzeroberfläche der Startseite.
  *
- * Aufgaben:
- * - Übersicht aller Untersuchungen
- * - Navigation zur Lagerübersicht
- * - Navigation zur neuen Untersuchung
+ * Die Startseite zeigt:
+ * - die Untersuchungsübersicht,
+ * - den Button zur Lagerseite,
+ * - den Button zur Erfassung einer neuen Untersuchung.
  *
- * Die View enthält keine Geschäftslogik.
- * Die Navigation wird durch den Controller gesteuert.
+ * Die Klasse enthält keine Datenbanklogik.
  */
 public class Startseite {
 
@@ -32,36 +31,35 @@ public class Startseite {
     private final BorderPane hauptLayout;
 
     /*
-     * Buttons für die Navigation.
+     * Navigationsbuttons.
      */
     private final Button lagerButton;
     private final Button neueUntersuchungButton;
 
     /*
-     * Tabelle zur Anzeige der Untersuchungen.
+     * Tabelle der Untersuchungen.
      */
     private final TableView<Object> untersuchungsTabelle;
 
     /**
-     * Konstruktor erstellt die komplette Oberfläche.
+     * Konstruktor erstellt die vollständige Startseite.
      */
     public Startseite() {
 
         /*
-         * Hauptlayout anlegen.
+         * Hauptlayout ohne feste Größe.
          */
         hauptLayout = new BorderPane();
-        hauptLayout.setPadding(new Insets(0));
 
         /*
-         * Oberen Kopfbereich erstellen.
+         * Kopfbereich.
          */
         HBox kopfbereich = new HBox(12);
         kopfbereich.setAlignment(Pos.CENTER_LEFT);
         kopfbereich.getStyleClass().add("kopfbereich");
 
         /*
-         * Hauptüberschrift.
+         * Überschrift.
          */
         Label ueberschrift =
                 new Label("Endoskopie-Dokumentation");
@@ -71,20 +69,19 @@ public class Startseite {
                 .add("ueberschrift");
 
         /*
-         * Untertitel zur besseren Orientierung.
+         * Untertitel.
          */
         Label untertitel =
                 new Label(
                         "Übersicht der dokumentierten Untersuchungen"
                 );
 
-        untertitel.setStyle(
-                "-fx-text-fill: #6b7b8c;" +
-                "-fx-font-size: 13px;"
-        );
+        untertitel
+                .getStyleClass()
+                .add("untertitel");
 
         /*
-         * Titel und Untertitel vertikal anordnen.
+         * Titel und Untertitel vertikal darstellen.
          */
         VBox titelBereich =
                 new VBox(
@@ -97,18 +94,17 @@ public class Startseite {
          * Flexibler Abstand verschiebt die Buttons nach rechts.
          */
         Region abstand = new Region();
+
         HBox.setHgrow(
                 abstand,
                 Priority.ALWAYS
         );
 
         /*
-         * Button zur Lagerübersicht.
+         * Lagerbutton.
          */
         lagerButton =
                 new Button("Lager");
-
-        lagerButton.setPrefWidth(120);
 
         /*
          * Button für eine neue Untersuchung.
@@ -116,17 +112,12 @@ public class Startseite {
         neueUntersuchungButton =
                 new Button("Neue Untersuchung");
 
-        neueUntersuchungButton.setPrefWidth(190);
-
-        /*
-         * Blauer Hauptbutton gemäß CSS.
-         */
         neueUntersuchungButton
                 .getStyleClass()
                 .add("hauptbutton");
 
         /*
-         * Alle Elemente in den Kopfbereich einsetzen.
+         * Kopfbereich zusammensetzen.
          */
         kopfbereich.getChildren().addAll(
                 titelBereich,
@@ -136,11 +127,32 @@ public class Startseite {
         );
 
         /*
-         * Tabelle anlegen.
+         * Untersuchungstabelle.
          */
         untersuchungsTabelle =
                 new TableView<>();
 
+        /*
+         * Tabelle nutzt den verfügbaren Raum.
+         */
+        untersuchungsTabelle.setMaxWidth(
+                Double.MAX_VALUE
+        );
+
+        untersuchungsTabelle.setMaxHeight(
+                Double.MAX_VALUE
+        );
+
+        /*
+         * Spalten verteilen sich auf die Tabellenbreite.
+         */
+        untersuchungsTabelle.setColumnResizePolicy(
+                TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
+        );
+
+        /*
+         * Anzeige bei leerer Tabelle.
+         */
         untersuchungsTabelle.setPlaceholder(
                 new Label(
                         "Noch keine Untersuchungen vorhanden."
@@ -148,14 +160,7 @@ public class Startseite {
         );
 
         /*
-         * Spalten passen sich automatisch an.
-         */
-        untersuchungsTabelle.setColumnResizePolicy(
-                TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
-        );
-
-        /*
-         * Spalte: Untersuchungsdatum.
+         * Spalte: Datum.
          */
         TableColumn<Object, String> datumSpalte =
                 new TableColumn<>("Datum");
@@ -184,7 +189,7 @@ public class Startseite {
         TableColumn<Object, String> geburtsdatumSpalte =
                 new TableColumn<>("Geburtsdatum");
 
-        geburtsdatumSpalte.setPrefWidth(150);
+        geburtsdatumSpalte.setPrefWidth(160);
 
         /*
          * Spalte: Untersuchungsart.
@@ -192,7 +197,7 @@ public class Startseite {
         TableColumn<Object, String> untersuchungsartSpalte =
                 new TableColumn<>("Untersuchungsart");
 
-        untersuchungsartSpalte.setPrefWidth(180);
+        untersuchungsartSpalte.setPrefWidth(190);
 
         /*
          * Spalte: Verbrauchsmaterial.
@@ -200,10 +205,10 @@ public class Startseite {
         TableColumn<Object, String> materialSpalte =
                 new TableColumn<>("Verbrauchsmaterial");
 
-        materialSpalte.setPrefWidth(360);
+        materialSpalte.setPrefWidth(380);
 
         /*
-         * Spalten zur Tabelle hinzufügen.
+         * Spalten hinzufügen.
          */
         untersuchungsTabelle.getColumns().addAll(
                 datumSpalte,
@@ -215,31 +220,33 @@ public class Startseite {
         );
 
         /*
-         * Inhaltsbereich mit weißer Karte.
+         * Überschrift über der Tabelle.
+         */
+        Label tabellenTitel =
+                new Label("Untersuchungsübersicht");
+
+        tabellenTitel
+                .getStyleClass()
+                .add("abschnittsueberschrift");
+
+        /*
+         * Inhaltsbereich.
          */
         VBox inhaltsBereich =
-                new VBox(15);
+                new VBox(
+                        15,
+                        tabellenTitel,
+                        untersuchungsTabelle
+                );
 
         inhaltsBereich.setPadding(
                 new Insets(24)
         );
 
-        /*
-         * Kleine Abschnittsüberschrift.
-         */
-        Label tabellenTitel =
-                new Label(
-                        "Untersuchungsübersicht"
-                );
-
-        tabellenTitel.setStyle(
-                "-fx-font-size: 18px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: #173b63;"
-        );
+        inhaltsBereich.setFillWidth(true);
 
         /*
-         * Tabelle soll den verfügbaren Platz nutzen.
+         * Tabelle nutzt den restlichen vertikalen Platz.
          */
         VBox.setVgrow(
                 untersuchungsTabelle,
@@ -247,15 +254,7 @@ public class Startseite {
         );
 
         /*
-         * Inhalt zusammensetzen.
-         */
-        inhaltsBereich.getChildren().addAll(
-                tabellenTitel,
-                untersuchungsTabelle
-        );
-
-        /*
-         * Kopfbereich und Inhalt in das Hauptlayout einsetzen.
+         * Gesamtlayout zusammensetzen.
          */
         hauptLayout.setTop(kopfbereich);
         hauptLayout.setCenter(inhaltsBereich);
@@ -269,7 +268,7 @@ public class Startseite {
     }
 
     /**
-     * Gibt den Lager-Button zurück.
+     * Gibt den Lagerbutton zurück.
      */
     public Button getLagerButton() {
         return lagerButton;

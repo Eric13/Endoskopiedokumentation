@@ -8,6 +8,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
@@ -19,24 +20,26 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 /**
- * Moderne Benutzeroberfläche zur Erfassung
- * einer neuen Untersuchung.
+ * Benutzeroberfläche zur Erfassung einer neuen Untersuchung.
  *
- * Die View enthält ausschließlich Elemente
- * der Benutzeroberfläche.
+ * Die Ansicht enthält:
+ * - Patienten- und Leistungsdaten,
+ * - Auswahl der Untersuchungsart,
+ * - Erfassung mehrerer Verbrauchsmaterialien,
+ * - Materialmenge,
+ * - Speichern- und Navigationsbuttons.
  *
- * Validierung, Speicherung und Datenbankzugriffe
- * werden später in einem Controller umgesetzt.
+ * Die Datenbank- und Speicherlogik wird später ergänzt.
  */
 public class NeueUntersuchung {
 
     /*
-     * Hauptlayout der Seite.
+     * Hauptlayout.
      */
     private final BorderPane hauptLayout;
 
     /*
-     * Eingabefelder für Patienten- und Leistungsdaten.
+     * Patienten- und Leistungsfelder.
      */
     private final DatePicker datumFeld;
     private final TextField patientenIdFeld;
@@ -46,14 +49,14 @@ public class NeueUntersuchung {
     private final ComboBox<String> untersuchungsartAuswahl;
 
     /*
-     * Eingabefelder für den Materialverbrauch.
+     * Materialfelder.
      */
     private final ComboBox<String> materialAuswahl;
     private final Spinner<Integer> mengenAuswahl;
     private final ListView<String> materialListe;
 
     /*
-     * Aktionsbuttons.
+     * Buttons.
      */
     private final Button materialHinzufuegenButton;
     private final Button materialEntfernenButton;
@@ -61,25 +64,24 @@ public class NeueUntersuchung {
     private final Button zurueckButton;
 
     /**
-     * Konstruktor erstellt die vollständige Oberfläche.
+     * Konstruktor erstellt die gesamte Ansicht.
      */
     public NeueUntersuchung() {
 
         /*
-         * Hauptlayout erstellen.
+         * Hauptlayout.
          */
         hauptLayout = new BorderPane();
-        hauptLayout.setPadding(new Insets(0));
 
         /*
-         * Kopfbereich erstellen.
+         * Kopfbereich.
          */
         HBox kopfbereich = new HBox(12);
         kopfbereich.setAlignment(Pos.CENTER_LEFT);
         kopfbereich.getStyleClass().add("kopfbereich");
 
         /*
-         * Titel.
+         * Überschrift.
          */
         Label ueberschrift =
                 new Label("Neue Untersuchung");
@@ -96,13 +98,12 @@ public class NeueUntersuchung {
                         "Patienten-, Leistungs- und Materialdaten erfassen"
                 );
 
-        untertitel.setStyle(
-                "-fx-text-fill: #6b7b8c;" +
-                "-fx-font-size: 13px;"
-        );
+        untertitel
+                .getStyleClass()
+                .add("untertitel");
 
         /*
-         * Titel und Untertitel untereinander anordnen.
+         * Titelbereich.
          */
         VBox titelBereich =
                 new VBox(
@@ -112,8 +113,7 @@ public class NeueUntersuchung {
                 );
 
         /*
-         * Flexibler Abstand verschiebt den Zurück-Button
-         * nach rechts.
+         * Flexibler Abstand.
          */
         Region abstand = new Region();
 
@@ -124,8 +124,6 @@ public class NeueUntersuchung {
 
         /*
          * Zurück-Button.
-         *
-         * Die Aktion wird im NavigationsController festgelegt.
          */
         zurueckButton =
                 new Button("Zurück");
@@ -140,7 +138,9 @@ public class NeueUntersuchung {
          * Eingabefelder erzeugen.
          */
         datumFeld = new DatePicker();
-        datumFeld.setPromptText("Untersuchungsdatum");
+        datumFeld.setPromptText(
+                "Untersuchungsdatum"
+        );
 
         patientenIdFeld = new TextField();
         patientenIdFeld.setPromptText(
@@ -159,9 +159,9 @@ public class NeueUntersuchung {
         );
 
         /*
-         * Auswahl der Untersuchungsart.
+         * Untersuchungsarten.
          *
-         * Diese Werte werden später aus MariaDB geladen.
+         * Später werden diese aus MariaDB geladen.
          */
         untersuchungsartAuswahl =
                 new ComboBox<>();
@@ -176,91 +176,20 @@ public class NeueUntersuchung {
                 "Untersuchungsart auswählen"
         );
 
+        /*
+         * Eingabefelder über die verfügbare Breite ziehen.
+         */
+        datumFeld.setMaxWidth(Double.MAX_VALUE);
+        patientenIdFeld.setMaxWidth(Double.MAX_VALUE);
+        vornameFeld.setMaxWidth(Double.MAX_VALUE);
+        nachnameFeld.setMaxWidth(Double.MAX_VALUE);
+        geburtsdatumFeld.setMaxWidth(Double.MAX_VALUE);
         untersuchungsartAuswahl.setMaxWidth(
                 Double.MAX_VALUE
         );
 
         /*
-         * Materialauswahl.
-         *
-         * Die Daten werden später aus der Tabelle Material geladen.
-         */
-        materialAuswahl =
-                new ComboBox<>();
-
-        materialAuswahl.getItems().addAll(
-                "Biopsiezange",
-                "Clip",
-                "Injektionsnadel",
-                "Polypektomieschlinge"
-        );
-
-        materialAuswahl.setPromptText(
-                "Material auswählen"
-        );
-
-        materialAuswahl.setPrefWidth(260);
-
-        /*
-         * Mengenauswahl:
-         * mindestens 1,
-         * höchstens 100,
-         * Startwert 1.
-         */
-        mengenAuswahl =
-                new Spinner<>(1, 100, 1);
-
-        mengenAuswahl.setPrefWidth(90);
-
-        /*
-         * Material hinzufügen.
-         *
-         * Die eigentliche Aktion wird später
-         * vom Controller festgelegt.
-         */
-        materialHinzufuegenButton =
-                new Button("Material hinzufügen");
-
-        materialHinzufuegenButton
-                .getStyleClass()
-                .add("hauptbutton");
-
-        /*
-         * Material entfernen.
-         */
-        materialEntfernenButton =
-                new Button("Material entfernen");
-
-        /*
-         * Liste zur Anzeige der bereits ausgewählten Materialien.
-         */
-        materialListe =
-                new ListView<>();
-
-        materialListe.setPrefHeight(170);
-
-        materialListe.setPlaceholder(
-                new Label(
-                        "Noch kein Material hinzugefügt."
-                )
-        );
-
-        /*
-         * Speichern-Button.
-         *
-         * Die Speicherlogik folgt später im Controller.
-         */
-        speichernButton =
-                new Button("Untersuchung speichern");
-
-        speichernButton
-                .getStyleClass()
-                .add("erfolgsbutton");
-
-        speichernButton.setPrefWidth(220);
-
-        /*
-         * Patienten- und Leistungsdatenkarte.
+         * Formular für Patientendaten.
          */
         GridPane patientenFormular =
                 new GridPane();
@@ -269,22 +198,25 @@ public class NeueUntersuchung {
         patientenFormular.setVgap(16);
 
         /*
-         * Erste Spalte enthält Bezeichnungen.
+         * Spalte für Feldbezeichnungen.
          */
         ColumnConstraints beschriftungsSpalte =
                 new ColumnConstraints();
 
-        beschriftungsSpalte.setMinWidth(170);
+        beschriftungsSpalte.setMinWidth(180);
 
         /*
-         * Zweite Spalte enthält Eingabefelder
-         * und soll den restlichen Platz nutzen.
+         * Flexible Spalte für Eingabefelder.
          */
         ColumnConstraints eingabeSpalte =
                 new ColumnConstraints();
 
-        eingabeSpalte.setMinWidth(320);
-        eingabeSpalte.setHgrow(Priority.ALWAYS);
+        eingabeSpalte.setMinWidth(250);
+        eingabeSpalte.setHgrow(
+                Priority.ALWAYS
+        );
+
+        eingabeSpalte.setFillWidth(true);
 
         patientenFormular
                 .getColumnConstraints()
@@ -293,12 +225,9 @@ public class NeueUntersuchung {
                         eingabeSpalte
                 );
 
-        datumFeld.setMaxWidth(Double.MAX_VALUE);
-        patientenIdFeld.setMaxWidth(Double.MAX_VALUE);
-        vornameFeld.setMaxWidth(Double.MAX_VALUE);
-        nachnameFeld.setMaxWidth(Double.MAX_VALUE);
-        geburtsdatumFeld.setMaxWidth(Double.MAX_VALUE);
-
+        /*
+         * Formularfelder einfügen.
+         */
         patientenFormular.add(
                 new Label("Untersuchungsdatum"),
                 0,
@@ -372,7 +301,79 @@ public class NeueUntersuchung {
         );
 
         /*
-         * Materialeingabe horizontal anordnen.
+         * Materialauswahl.
+         */
+        materialAuswahl =
+                new ComboBox<>();
+
+        materialAuswahl.getItems().addAll(
+                "Biopsiezange",
+                "Clip",
+                "Injektionsnadel",
+                "Polypektomieschlinge"
+        );
+
+        materialAuswahl.setPromptText(
+                "Material auswählen"
+        );
+
+        materialAuswahl.setMaxWidth(
+                Double.MAX_VALUE
+        );
+
+        HBox.setHgrow(
+                materialAuswahl,
+                Priority.ALWAYS
+        );
+
+        /*
+         * Mengenauswahl:
+         * Minimum 1, Maximum 100, Startwert 1.
+         */
+        mengenAuswahl =
+                new Spinner<>(1, 100, 1);
+
+        mengenAuswahl.setPrefWidth(100);
+
+        /*
+         * Material hinzufügen.
+         */
+        materialHinzufuegenButton =
+                new Button("Material hinzufügen");
+
+        materialHinzufuegenButton
+                .getStyleClass()
+                .add("hauptbutton");
+
+        /*
+         * Material entfernen.
+         */
+        materialEntfernenButton =
+                new Button("Material entfernen");
+
+        /*
+         * Liste der ausgewählten Materialien.
+         */
+        materialListe =
+                new ListView<>();
+
+        materialListe.setPlaceholder(
+                new Label(
+                        "Noch kein Material hinzugefügt."
+                )
+        );
+
+        materialListe.setMinHeight(160);
+        materialListe.setMaxHeight(
+                Double.MAX_VALUE
+        );
+
+        materialListe.setMaxWidth(
+                Double.MAX_VALUE
+        );
+
+        /*
+         * Materialeingabe.
          */
         HBox materialEingabe =
                 new HBox(
@@ -386,36 +387,41 @@ public class NeueUntersuchung {
                 Pos.CENTER_LEFT
         );
 
+        materialEingabe.setFillHeight(true);
+
         /*
-         * Überschrift für Patientendaten.
+         * Speichern-Button.
+         */
+        speichernButton =
+                new Button("Untersuchung speichern");
+
+        speichernButton
+                .getStyleClass()
+                .add("erfolgsbutton");
+
+        speichernButton.setPrefWidth(230);
+
+        /*
+         * Überschriften der Formularkarten.
          */
         Label patientenTitel =
                 new Label(
                         "Patienten- und Leistungsdaten"
                 );
 
-        patientenTitel.setStyle(
-                "-fx-font-size: 18px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: #173b63;"
-        );
+        patientenTitel
+                .getStyleClass()
+                .add("abschnittsueberschrift");
 
-        /*
-         * Überschrift für den Materialbereich.
-         */
         Label materialTitel =
-                new Label(
-                        "Verbrauchsmaterial"
-                );
+                new Label("Verbrauchsmaterial");
 
-        materialTitel.setStyle(
-                "-fx-font-size: 18px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: #173b63;"
-        );
+        materialTitel
+                .getStyleClass()
+                .add("abschnittsueberschrift");
 
         /*
-         * Karte für Patientendaten.
+         * Karte für Patienten- und Leistungsdaten.
          */
         VBox patientenKarte =
                 new VBox(
@@ -427,6 +433,10 @@ public class NeueUntersuchung {
         patientenKarte
                 .getStyleClass()
                 .add("formular-karte");
+
+        patientenKarte.setMaxWidth(
+                Double.MAX_VALUE
+        );
 
         /*
          * Karte für Materialdaten.
@@ -444,6 +454,18 @@ public class NeueUntersuchung {
                 .getStyleClass()
                 .add("formular-karte");
 
+        materialKarte.setMaxWidth(
+                Double.MAX_VALUE
+        );
+
+        /*
+         * Materialliste nutzt zusätzlichen Platz.
+         */
+        VBox.setVgrow(
+                materialListe,
+                Priority.ALWAYS
+        );
+
         /*
          * Speichern-Button rechts ausrichten.
          */
@@ -455,7 +477,7 @@ public class NeueUntersuchung {
         );
 
         /*
-         * Hauptinhalt.
+         * Gesamter Inhaltsbereich.
          */
         VBox inhaltsBereich =
                 new VBox(
@@ -469,107 +491,85 @@ public class NeueUntersuchung {
                 new Insets(24)
         );
 
+        inhaltsBereich.setFillWidth(true);
+        inhaltsBereich.setMaxWidth(
+                Double.MAX_VALUE
+        );
+
         /*
-         * Gesamtlayout zusammensetzen.
+         * ScrollPane ermöglicht die Nutzung auch
+         * auf kleineren Displays.
+         */
+        ScrollPane scrollBereich =
+                new ScrollPane(inhaltsBereich);
+
+        scrollBereich.setFitToWidth(true);
+        scrollBereich.setFitToHeight(false);
+        scrollBereich.setPannable(true);
+
+        scrollBereich
+                .getStyleClass()
+                .add("transparenter-scrollbereich");
+
+        /*
+         * Layout zusammensetzen.
          */
         hauptLayout.setTop(kopfbereich);
-        hauptLayout.setCenter(inhaltsBereich);
+        hauptLayout.setCenter(scrollBereich);
     }
 
-    /**
-     * Gibt die vollständige Ansicht zurück.
-     */
     public Parent getAnsicht() {
         return hauptLayout;
     }
 
-    /**
-     * Gibt das Untersuchungsdatum zurück.
-     */
     public DatePicker getDatumFeld() {
         return datumFeld;
     }
 
-    /**
-     * Gibt das Feld für die Patienten-ID zurück.
-     */
     public TextField getPatientenIdFeld() {
         return patientenIdFeld;
     }
 
-    /**
-     * Gibt das Vornamenfeld zurück.
-     */
     public TextField getVornameFeld() {
         return vornameFeld;
     }
 
-    /**
-     * Gibt das Nachnamenfeld zurück.
-     */
     public TextField getNachnameFeld() {
         return nachnameFeld;
     }
 
-    /**
-     * Gibt das Feld für das Geburtsdatum zurück.
-     */
     public DatePicker getGeburtsdatumFeld() {
         return geburtsdatumFeld;
     }
 
-    /**
-     * Gibt die Auswahl der Untersuchungsart zurück.
-     */
     public ComboBox<String> getUntersuchungsartAuswahl() {
         return untersuchungsartAuswahl;
     }
 
-    /**
-     * Gibt die Materialauswahl zurück.
-     */
     public ComboBox<String> getMaterialAuswahl() {
         return materialAuswahl;
     }
 
-    /**
-     * Gibt die Mengenauswahl zurück.
-     */
     public Spinner<Integer> getMengenAuswahl() {
         return mengenAuswahl;
     }
 
-    /**
-     * Gibt die Liste der ausgewählten Materialien zurück.
-     */
     public ListView<String> getMaterialListe() {
         return materialListe;
     }
 
-    /**
-     * Gibt den Hinzufügen-Button zurück.
-     */
     public Button getMaterialHinzufuegenButton() {
         return materialHinzufuegenButton;
     }
 
-    /**
-     * Gibt den Entfernen-Button zurück.
-     */
     public Button getMaterialEntfernenButton() {
         return materialEntfernenButton;
     }
 
-    /**
-     * Gibt den Speichern-Button zurück.
-     */
     public Button getSpeichernButton() {
         return speichernButton;
     }
 
-    /**
-     * Gibt den Zurück-Button zurück.
-     */
     public Button getZurueckButton() {
         return zurueckButton;
     }

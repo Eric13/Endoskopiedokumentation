@@ -124,7 +124,7 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.06), 10, 0, 0, 3);
 }
 
-/* Statusfarben für Sprint 3 */
+/* Statusfarben für die Zukunft */
 .status-ok {
     -fx-background-color: #dff4e8;
     -fx-text-fill: #1f6b43;

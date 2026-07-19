@@ -3,45 +3,37 @@ package application;
 import controller.NavigationsController;
 import javafx.application.Application;
 import javafx.stage.Stage;
+
 /**
  * Einstiegspunkt der JavaFX-Anwendung.
  *
- * Diese Klasse:
- * - startet JavaFX,
- * - erzeugt den NavigationsController,
- * - öffnet beim Programmstart die Startseite.
+ * Die Klasse erzeugt das Hauptfenster und startet
+ * die Navigation mit der Startseite.
  */
 public class Hauptprogramm extends Application {
 
     /**
-     * Diese Methode wird automatisch von JavaFX aufgerufen.
+     * Wird von JavaFX beim Programmstart aufgerufen.
      *
-     * @param hauptFenster Hauptfenster der Anwendung
+     * @param hauptFenster gemeinsames Fenster der Anwendung
      */
     @Override
     public void start(Stage hauptFenster) {
 
         /*
-         * NavigationsController erzeugen.
-         * Er verwaltet den Wechsel zwischen:
-         * - Startseite
-         * - Neue Untersuchung
-         * - Lager
+         * Der NavigationsController verwaltet alle Seitenwechsel.
          */
-        NavigationsController navigationsController =
+        NavigationsController navigation =
                 new NavigationsController(hauptFenster);
 
         /*
-         * Beim Start wird die Startseite geöffnet.
+         * Beim Programmstart wird die Startseite angezeigt.
          */
-        navigationsController.zeigeStartseite();
+        navigation.zeigeStartseite();
     }
 
     /**
-     * Klassischer Programmeinstieg.
-     *
-     * launch() startet die JavaFX-Laufzeit
-     * und ruft anschließend start() auf.
+     * Klassischer Einstiegspunkt des Programms.
      */
     public static void main(String[] args) {
         launch(args);
