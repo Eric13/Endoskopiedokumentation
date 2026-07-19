@@ -1,5 +1,8 @@
+database\DatenbankTest.class
+application\Hauptprogramm.class
 view\NeueUntersuchung.class
 view\Lager.class
 controller\NavigationsController.class
-application\Hauptprogramm.class
+database\Datenbank.class
+main\java\model\Untersuchung.class
 view\Startseite.class
