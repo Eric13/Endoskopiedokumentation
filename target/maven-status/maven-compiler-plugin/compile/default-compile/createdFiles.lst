@@ -1,8 +1,11 @@
+model\Untersuchung.class
+dao\UntersuchungsDAO.class
 database\DatenbankTest.class
 application\Hauptprogramm.class
+model\Materialverbrauch.class
 view\NeueUntersuchung.class
 view\Lager.class
 controller\NavigationsController.class
 database\Datenbank.class
-main\java\model\Untersuchung.class
+model\UntersuchungsEintrag.class
 view\Startseite.class

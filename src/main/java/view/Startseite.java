@@ -1,5 +1,6 @@
 package view;
 
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -12,113 +13,67 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import model.UntersuchungsEintrag;
 
 /**
  * Benutzeroberfläche der Startseite.
  *
  * Die Startseite zeigt:
- * - die Untersuchungsübersicht,
- * - den Button zur Lagerseite,
- * - den Button zur Erfassung einer neuen Untersuchung.
+ * - alle gespeicherten Untersuchungen,
+ * - den Button zur Lagerverwaltung,
+ * - den Button zum Erfassen einer neuen Untersuchung.
  *
- * Die Klasse enthält keine Datenbanklogik.
+ * Die Klasse enthält ausschließlich die Benutzeroberfläche.
+ * Das Laden der Daten aus MariaDB erfolgt im Controller.
  */
 public class Startseite {
 
-    /*
-     * Hauptlayout der Seite.
-     */
+    /* Hauptlayout der Seite. */
     private final BorderPane hauptLayout;
 
-    /*
-     * Navigationsbuttons.
-     */
+    /* Navigationsbuttons. */
     private final Button lagerButton;
     private final Button neueUntersuchungButton;
 
-    /*
-     * Tabelle der Untersuchungen.
-     */
-    private final TableView<Object> untersuchungsTabelle;
+    /* Tabelle mit den gespeicherten Untersuchungen. */
+    private final TableView<UntersuchungsEintrag> untersuchungsTabelle;
 
-    /**
-     * Konstruktor erstellt die vollständige Startseite.
-     */
+    /** Erstellt die vollständige Startseite. */
     public Startseite() {
 
-        /*
-         * Hauptlayout ohne feste Größe.
-         */
+        /* Hauptlayout ohne feste Größe. */
         hauptLayout = new BorderPane();
 
-        /*
-         * Kopfbereich.
-         */
+        /* Kopfbereich. */
         HBox kopfbereich = new HBox(12);
         kopfbereich.setAlignment(Pos.CENTER_LEFT);
         kopfbereich.getStyleClass().add("kopfbereich");
 
-        /*
-         * Überschrift.
-         */
-        Label ueberschrift =
-                new Label("Endoskopie-Dokumentation");
+        /* Hauptüberschrift. */
+        Label ueberschrift = new Label("Endoskopie-Dokumentation");
+        ueberschrift.getStyleClass().add("ueberschrift");
 
-        ueberschrift
-                .getStyleClass()
-                .add("ueberschrift");
-
-        /*
-         * Untertitel.
-         */
-        Label untertitel =
-                new Label(
-                        "Übersicht der dokumentierten Untersuchungen"
-                );
-
-        untertitel
-                .getStyleClass()
-                .add("untertitel");
-
-        /*
-         * Titel und Untertitel vertikal darstellen.
-         */
-        VBox titelBereich =
-                new VBox(
-                        3,
-                        ueberschrift,
-                        untertitel
-                );
-
-        /*
-         * Flexibler Abstand verschiebt die Buttons nach rechts.
-         */
-        Region abstand = new Region();
-
-        HBox.setHgrow(
-                abstand,
-                Priority.ALWAYS
+        /* Untertitel. */
+        Label untertitel = new Label(
+                "Übersicht der dokumentierten Untersuchungen"
         );
+        untertitel.getStyleClass().add("untertitel");
 
-        /*
-         * Lagerbutton.
-         */
-        lagerButton =
-                new Button("Lager");
+        /* Überschrift und Untertitel untereinander anordnen. */
+        VBox titelBereich = new VBox(3, ueberschrift, untertitel);
 
-        /*
-         * Button für eine neue Untersuchung.
-         */
-        neueUntersuchungButton =
-                new Button("Neue Untersuchung");
+        /* Flexibler Abstand verschiebt die Buttons nach rechts. */
+        Region abstand = new Region();
+        HBox.setHgrow(abstand, Priority.ALWAYS);
 
-        neueUntersuchungButton
-                .getStyleClass()
-                .add("hauptbutton");
+        /* Button zur Lagerübersicht. */
+        lagerButton = new Button("Lager");
 
-        /*
-         * Kopfbereich zusammensetzen.
-         */
+        /* Button zur Erfassung einer neuen Untersuchung. */
+        neueUntersuchungButton = new Button("Neue Untersuchung");
+        neueUntersuchungButton.getStyleClass().add("hauptbutton");
+
+        /* Kopfbereich zusammensetzen. */
         kopfbereich.getChildren().addAll(
                 titelBereich,
                 abstand,
@@ -126,90 +81,78 @@ public class Startseite {
                 neueUntersuchungButton
         );
 
-        /*
-         * Untersuchungstabelle.
-         */
-        untersuchungsTabelle =
-                new TableView<>();
-
-        /*
-         * Tabelle nutzt den verfügbaren Raum.
-         */
-        untersuchungsTabelle.setMaxWidth(
-                Double.MAX_VALUE
-        );
-
-        untersuchungsTabelle.setMaxHeight(
-                Double.MAX_VALUE
-        );
-
-        /*
-         * Spalten verteilen sich auf die Tabellenbreite.
-         */
+        /* Untersuchungstabelle erzeugen. */
+        untersuchungsTabelle = new TableView<>();
+        untersuchungsTabelle.setMaxWidth(Double.MAX_VALUE);
+        untersuchungsTabelle.setMaxHeight(Double.MAX_VALUE);
         untersuchungsTabelle.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );
-
-        /*
-         * Anzeige bei leerer Tabelle.
-         */
         untersuchungsTabelle.setPlaceholder(
-                new Label(
-                        "Noch keine Untersuchungen vorhanden."
-                )
+                new Label("Noch keine Untersuchungen vorhanden.")
         );
 
-        /*
-         * Spalte: Datum.
-         */
-        TableColumn<Object, String> datumSpalte =
+        /* Spalte: Untersuchungsdatum. */
+        TableColumn<UntersuchungsEintrag, String> datumSpalte =
                 new TableColumn<>("Datum");
+        datumSpalte.setCellValueFactory(
+                eintrag -> new ReadOnlyStringWrapper(
+                        eintrag.getValue().getDatum()
+                )
+        );
+        datumSpalte.setPrefWidth(145);
 
-        datumSpalte.setPrefWidth(120);
-
-        /*
-         * Spalte: Untersuchungs-ID.
-         */
-        TableColumn<Object, String> idSpalte =
+        /* Spalte: Untersuchungsnummer. */
+        TableColumn<UntersuchungsEintrag, String> idSpalte =
                 new TableColumn<>("ID");
+        idSpalte.setCellValueFactory(
+                eintrag -> new ReadOnlyStringWrapper(
+                        eintrag.getValue().getUntersuchungsnummer()
+                )
+        );
+        idSpalte.setPrefWidth(190);
 
-        idSpalte.setPrefWidth(120);
-
-        /*
-         * Spalte: Patientenname.
-         */
-        TableColumn<Object, String> nameSpalte =
+        /* Spalte: vollständiger Patientenname. */
+        TableColumn<UntersuchungsEintrag, String> nameSpalte =
                 new TableColumn<>("Name");
+        nameSpalte.setCellValueFactory(
+                eintrag -> new ReadOnlyStringWrapper(
+                        eintrag.getValue().getPatientenname()
+                )
+        );
+        nameSpalte.setPrefWidth(220);
 
-        nameSpalte.setPrefWidth(240);
-
-        /*
-         * Spalte: Geburtsdatum.
-         */
-        TableColumn<Object, String> geburtsdatumSpalte =
+        /* Spalte: Geburtsdatum. */
+        TableColumn<UntersuchungsEintrag, String> geburtsdatumSpalte =
                 new TableColumn<>("Geburtsdatum");
+        geburtsdatumSpalte.setCellValueFactory(
+                eintrag -> new ReadOnlyStringWrapper(
+                        eintrag.getValue().getGeburtsdatum()
+                )
+        );
+        geburtsdatumSpalte.setPrefWidth(155);
 
-        geburtsdatumSpalte.setPrefWidth(160);
-
-        /*
-         * Spalte: Untersuchungsart.
-         */
-        TableColumn<Object, String> untersuchungsartSpalte =
+        /* Spalte: Untersuchungsart. */
+        TableColumn<UntersuchungsEintrag, String> untersuchungsartSpalte =
                 new TableColumn<>("Untersuchungsart");
-
+        untersuchungsartSpalte.setCellValueFactory(
+                eintrag -> new ReadOnlyStringWrapper(
+                        eintrag.getValue().getUntersuchungsart()
+                )
+        );
         untersuchungsartSpalte.setPrefWidth(190);
 
-        /*
-         * Spalte: Verbrauchsmaterial.
-         */
-        TableColumn<Object, String> materialSpalte =
+        /* Spalte: verwendete Verbrauchsmaterialien. */
+        TableColumn<UntersuchungsEintrag, String> materialSpalte =
                 new TableColumn<>("Verbrauchsmaterial");
-
+        materialSpalte.setCellValueFactory(
+                eintrag -> new ReadOnlyStringWrapper(
+                        eintrag.getValue().getMaterialverbrauch()
+                )
+        );
         materialSpalte.setPrefWidth(380);
 
-        /*
-         * Spalten hinzufügen.
-         */
+        /* Alle Spalten zur Tabelle hinzufügen. */
         untersuchungsTabelle.getColumns().addAll(
                 datumSpalte,
                 idSpalte,
@@ -219,72 +162,50 @@ public class Startseite {
                 materialSpalte
         );
 
-        /*
-         * Überschrift über der Tabelle.
-         */
-        Label tabellenTitel =
-                new Label("Untersuchungsübersicht");
+        /* Überschrift über der Untersuchungstabelle. */
+        Label tabellenTitel = new Label("Untersuchungsübersicht");
+        tabellenTitel.getStyleClass().add("abschnittsueberschrift");
 
-        tabellenTitel
-                .getStyleClass()
-                .add("abschnittsueberschrift");
-
-        /*
-         * Inhaltsbereich.
-         */
-        VBox inhaltsBereich =
-                new VBox(
-                        15,
-                        tabellenTitel,
-                        untersuchungsTabelle
-                );
-
-        inhaltsBereich.setPadding(
-                new Insets(24)
+        /* Inhaltsbereich der Startseite. */
+        VBox inhaltsBereich = new VBox(
+                15,
+                tabellenTitel,
+                untersuchungsTabelle
         );
-
+        inhaltsBereich.setPadding(new Insets(24));
         inhaltsBereich.setFillWidth(true);
 
-        /*
-         * Tabelle nutzt den restlichen vertikalen Platz.
-         */
-        VBox.setVgrow(
-                untersuchungsTabelle,
-                Priority.ALWAYS
-        );
+        /* Die Tabelle verwendet den restlichen vertikalen Platz. */
+        VBox.setVgrow(untersuchungsTabelle, Priority.ALWAYS);
 
-        /*
-         * Gesamtlayout zusammensetzen.
-         */
+        /* Gesamtlayout zusammensetzen. */
         hauptLayout.setTop(kopfbereich);
         hauptLayout.setCenter(inhaltsBereich);
     }
 
-    /**
-     * Gibt die vollständige Ansicht zurück.
-     */
+    /** @return Hauptlayout der Startseite */
     public Parent getAnsicht() {
         return hauptLayout;
     }
 
-    /**
-     * Gibt den Lagerbutton zurück.
-     */
+    /** @return Button zur Lagerübersicht */
     public Button getLagerButton() {
         return lagerButton;
     }
 
-    /**
-     * Gibt den Button für eine neue Untersuchung zurück.
-     */
+    /** @return Button zur Erfassung einer neuen Untersuchung */
     public Button getNeueUntersuchungButton() {
         return neueUntersuchungButton;
     }
 
     /**
-     * Gibt die Untersuchungstabelle zurück.
+     * Gibt die Tabelle der Untersuchungsübersicht zurück.
+     * Der Controller lädt die gespeicherten Untersuchungen
+     * aus MariaDB und trägt sie in diese Tabelle ein.
+     *
+     * @return Tabelle mit gespeicherten Untersuchungen
      */
-    public TableView<Object> getUntersuchungsTabelle() {
+    public TableView<UntersuchungsEintrag> getUntersuchungsTabelle() {
         return untersuchungsTabelle;
     }
 }
