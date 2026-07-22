@@ -84,6 +84,11 @@ public class MaterialDAO {
             }
         }
 
+        System.out.println(
+        "MaterialDAO: Geladene Materialien = "
+                + lagerartikel.size()
+);
+
         return lagerartikel;
     }
 

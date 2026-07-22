@@ -19,6 +19,8 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import dao.MaterialDAO;
+import model.Lagerartikel;
 
 /**
  * Steuert die Navigation zwischen den Ansichten
@@ -45,6 +47,11 @@ public class NavigationsController {
      */
     private final UntersuchungsDAO untersuchungsDAO;
 
+    /*
+ * Datenbankzugriff für Materialien.
+ */
+     private final MaterialDAO materialDAO;
+
     /**
      * Konstruktor.
      *
@@ -54,6 +61,7 @@ public class NavigationsController {
 
         this.hauptFenster = hauptFenster;
         this.untersuchungsDAO = new UntersuchungsDAO();
+        this.materialDAO = new MaterialDAO();
 
         /*
          * Für die einmalige Erzeugung der Scene
@@ -731,6 +739,37 @@ private void ladeUntersuchungen(
     }
 }
 
+/**
+ * Lädt alle Materialien aus MariaDB
+ * in die Lagerübersicht.
+ *
+ * @param lager aktuelle Lageransicht
+ */
+private void ladeMaterialien(
+        Lager lager
+) {
+
+    try {
+
+        lager
+                .getLagerTabelle()
+                .getItems()
+                .setAll(
+                        materialDAO.alleLaden()
+                );
+
+    } catch (SQLException fehler) {
+
+        zeigeFehler(
+                "Fehler beim Laden",
+                "Die Lagerdaten konnten nicht geladen werden.\n\n"
+                        + fehler.getMessage()
+        );
+
+        fehler.printStackTrace();
+    }
+}
+
     /**
      * Zeigt die Lagerübersicht.
      */
@@ -739,6 +778,114 @@ private void ladeUntersuchungen(
         Lager lager =
                 new Lager();
 
+                /*
+ * Materialdaten aus MariaDB laden.
+ */
+ladeMaterialien(lager);
+
+/*
+ * Lagerbestand erhöhen.
+ */
+lager
+        .getBestandErhoehenButton()
+        .setOnAction(ereignis -> {
+
+            Lagerartikel artikel =
+                    lager
+                            .getLagerTabelle()
+                            .getSelectionModel()
+                            .getSelectedItem();
+
+            if (artikel == null) {
+
+                zeigeFehler(
+                        "Keine Auswahl",
+                        "Bitte zuerst einen Materialartikel auswählen."
+                );
+
+                return;
+            }
+
+            int menge =
+                    lager
+                            .getMengenSpinner()
+                            .getValue();
+
+            try {
+
+                materialDAO.bestandErhoehen(
+                        artikel.getMaterialId(),
+                        menge
+                );
+
+                /*
+                 * Tabelle neu laden.
+                 */
+                ladeMaterialien(lager);
+
+            } catch (SQLException fehler) {
+
+                zeigeFehler(
+                        "Fehler",
+                        fehler.getMessage()
+                );
+
+                fehler.printStackTrace();
+            }
+
+        });
+
+        /*
+ * Lagerbestand verringern.
+ */
+lager
+        .getBestandVerringernButton()
+        .setOnAction(ereignis -> {
+
+            Lagerartikel artikel =
+                    lager
+                            .getLagerTabelle()
+                            .getSelectionModel()
+                            .getSelectedItem();
+
+            if (artikel == null) {
+
+                zeigeFehler(
+                        "Keine Auswahl",
+                        "Bitte zuerst einen Materialartikel auswählen."
+                );
+
+                return;
+            }
+
+            int menge =
+                    lager
+                            .getMengenSpinner()
+                            .getValue();
+
+            try {
+
+                materialDAO.bestandVerringern(
+                        artikel.getMaterialId(),
+                        menge
+                );
+
+                /*
+                 * Tabelle neu laden.
+                 */
+                ladeMaterialien(lager);
+
+            } catch (SQLException fehler) {
+
+                zeigeFehler(
+                        "Fehler",
+                        fehler.getMessage()
+                );
+
+                fehler.printStackTrace();
+            }
+
+        });
         lager
                 .getZurueckButton()
                 .setOnAction(
