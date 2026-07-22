@@ -1,8 +1,10 @@
 C:\Users\erics\Desktop\Endoskopiedokumentation\src\main\java\application\Hauptprogramm.java
 C:\Users\erics\Desktop\Endoskopiedokumentation\src\main\java\controller\NavigationsController.java
+C:\Users\erics\Desktop\Endoskopiedokumentation\src\main\java\dao\MaterialDAO.java
 C:\Users\erics\Desktop\Endoskopiedokumentation\src\main\java\dao\UntersuchungsDAO.java
 C:\Users\erics\Desktop\Endoskopiedokumentation\src\main\java\database\Datenbank.java
 C:\Users\erics\Desktop\Endoskopiedokumentation\src\main\java\database\DatenbankTest.java
+C:\Users\erics\Desktop\Endoskopiedokumentation\src\main\java\model\Lagerartikel.java
 C:\Users\erics\Desktop\Endoskopiedokumentation\src\main\java\model\Materialverbrauch.java
 C:\Users\erics\Desktop\Endoskopiedokumentation\src\main\java\model\Untersuchung.java
 C:\Users\erics\Desktop\Endoskopiedokumentation\src\main\java\model\UntersuchungsEintrag.java

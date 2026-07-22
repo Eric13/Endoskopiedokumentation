@@ -1,11 +1,13 @@
 model\Untersuchung.class
+dao\MaterialDAO.class
+model\Lagerartikel.class
+view\Lager.class
+controller\NavigationsController.class
+database\Datenbank.class
+model\UntersuchungsEintrag.class
 dao\UntersuchungsDAO.class
 database\DatenbankTest.class
 application\Hauptprogramm.class
 model\Materialverbrauch.class
 view\NeueUntersuchung.class
-view\Lager.class
-controller\NavigationsController.class
-database\Datenbank.class
-model\UntersuchungsEintrag.class
 view\Startseite.class

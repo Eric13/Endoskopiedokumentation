@@ -1,10 +1,14 @@
 package view;
 
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
@@ -12,6 +16,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import model.Lagerartikel;
 
 /**
  * Benutzeroberfläche der Lagerübersicht.
@@ -24,7 +29,8 @@ import javafx.scene.layout.VBox;
  * Sprint 3:
  * - Bestandsberechnung,
  * - Restbestand,
- * - Warnfunktion.
+ * - Warnfunktion,
+ * - manuelle Bestandsanpassung.
  */
 public class Lager {
 
@@ -41,7 +47,20 @@ public class Lager {
     /*
      * Lagertabelle.
      */
-    private final TableView<Object> lagerTabelle;
+    private final TableView<Lagerartikel> lagerTabelle;
+
+    /*
+     * Eingabefeld für die Bestandsänderung.
+     */
+    private final Spinner<Integer> mengenSpinner;
+
+    /*
+     * Buttons zum manuellen Ändern
+     * des Lagerbestands.
+     */
+    private final Button bestandErhoehenButton;
+
+    private final Button bestandVerringernButton;
 
     /**
      * Konstruktor erstellt die vollständige Lageransicht.
@@ -57,14 +76,22 @@ public class Lager {
          * Kopfbereich.
          */
         HBox kopfbereich = new HBox(12);
-        kopfbereich.setAlignment(Pos.CENTER_LEFT);
-        kopfbereich.getStyleClass().add("kopfbereich");
+
+        kopfbereich.setAlignment(
+                Pos.CENTER_LEFT
+        );
+
+        kopfbereich
+                .getStyleClass()
+                .add("kopfbereich");
 
         /*
          * Überschrift.
          */
         Label ueberschrift =
-                new Label("Lagerverwaltung");
+                new Label(
+                        "Lagerverwaltung"
+                );
 
         ueberschrift
                 .getStyleClass()
@@ -106,13 +133,20 @@ public class Lager {
          * Zurück-Button.
          */
         zurueckButton =
-                new Button("Zurück");
+                new Button(
+                        "Zurück"
+                );
 
-        kopfbereich.getChildren().addAll(
-                titelBereich,
-                abstand,
-                zurueckButton
-        );
+        /*
+         * Kopfbereich zusammensetzen.
+         */
+        kopfbereich
+                .getChildren()
+                .addAll(
+                        titelBereich,
+                        abstand,
+                        zurueckButton
+                );
 
         /*
          * Lagertabelle.
@@ -135,75 +169,207 @@ public class Lager {
         );
 
         /*
-         * Spalten passen sich an die Fensterbreite an.
+         * Spalten passen sich an
+         * die Fensterbreite an.
          */
         lagerTabelle.setColumnResizePolicy(
-                TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
+                TableView
+                        .CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );
 
         /*
          * Spalte: Artikelnummer.
          */
-        TableColumn<Object, String> artikelnummerSpalte =
-                new TableColumn<>("Artikelnummer");
+        TableColumn<Lagerartikel, String>
+                artikelnummerSpalte =
+                new TableColumn<>(
+                        "Artikelnummer"
+                );
+
+        artikelnummerSpalte.setCellValueFactory(
+                eintrag ->
+                        new ReadOnlyStringWrapper(
+                                eintrag
+                                        .getValue()
+                                        .getArtikelnummer()
+                        )
+        );
 
         artikelnummerSpalte.setPrefWidth(180);
 
         /*
          * Spalte: Bezeichnung.
          */
-        TableColumn<Object, String> bezeichnungSpalte =
-                new TableColumn<>("Bezeichnung");
+        TableColumn<Lagerartikel, String>
+                bezeichnungSpalte =
+                new TableColumn<>(
+                        "Bezeichnung"
+                );
+
+        bezeichnungSpalte.setCellValueFactory(
+                eintrag ->
+                        new ReadOnlyStringWrapper(
+                                eintrag
+                                        .getValue()
+                                        .getBezeichnung()
+                        )
+        );
 
         bezeichnungSpalte.setPrefWidth(350);
 
         /*
          * Spalte: aktueller Bestand.
          */
-        TableColumn<Object, Number> bestandSpalte =
-                new TableColumn<>("Bestand");
+        TableColumn<Lagerartikel, Number>
+                bestandSpalte =
+                new TableColumn<>(
+                        "Bestand"
+                );
+
+        bestandSpalte.setCellValueFactory(
+                eintrag ->
+                        new ReadOnlyObjectWrapper<>(
+                                eintrag
+                                        .getValue()
+                                        .getBestand()
+                        )
+        );
 
         bestandSpalte.setPrefWidth(150);
 
         /*
          * Spalte: Mindestbestand.
          */
-        TableColumn<Object, Number> mindestbestandSpalte =
-                new TableColumn<>("Mindestbestand");
+        TableColumn<Lagerartikel, Number>
+                mindestbestandSpalte =
+                new TableColumn<>(
+                        "Mindestbestand"
+                );
+
+        mindestbestandSpalte.setCellValueFactory(
+                eintrag ->
+                        new ReadOnlyObjectWrapper<>(
+                                eintrag
+                                        .getValue()
+                                        .getMindestbestand()
+                        )
+        );
 
         mindestbestandSpalte.setPrefWidth(180);
 
         /*
          * Spalte: Status.
-         *
-         * Wird später für "OK" beziehungsweise
-         * "Nachbestellen" verwendet.
          */
-        TableColumn<Object, String> statusSpalte =
-                new TableColumn<>("Status");
+        TableColumn<Lagerartikel, String>
+                statusSpalte =
+                new TableColumn<>(
+                        "Status"
+                );
+
+        statusSpalte.setCellValueFactory(
+                eintrag ->
+                        new ReadOnlyStringWrapper(
+                                eintrag
+                                        .getValue()
+                                        .getStatus()
+                        )
+        );
 
         statusSpalte.setPrefWidth(200);
 
         /*
          * Spalten hinzufügen.
          */
-        lagerTabelle.getColumns().addAll(
-                artikelnummerSpalte,
-                bezeichnungSpalte,
-                bestandSpalte,
-                mindestbestandSpalte,
-                statusSpalte
-        );
+        lagerTabelle
+                .getColumns()
+                .addAll(
+                        artikelnummerSpalte,
+                        bezeichnungSpalte,
+                        bestandSpalte,
+                        mindestbestandSpalte,
+                        statusSpalte
+                );
 
         /*
-         * Abschnittsüberschrift.
+         * Abschnittsüberschrift der Tabelle.
          */
         Label tabellenTitel =
-                new Label("Materialbestand");
+                new Label(
+                        "Materialbestand"
+                );
 
         tabellenTitel
                 .getStyleClass()
                 .add("abschnittsueberschrift");
+
+        /*
+         * Überschrift der Bestandspflege.
+         */
+        Label bestandTitel =
+                new Label(
+                        "Bestand manuell anpassen"
+                );
+
+        bestandTitel
+                .getStyleClass()
+                .add("abschnittsueberschrift");
+
+        /*
+         * Mengenauswahl.
+         *
+         * Minimum: 1
+         * Maximum: 1000
+         * Startwert: 1
+         */
+        mengenSpinner =
+                new Spinner<>();
+
+        mengenSpinner.setValueFactory(
+                new SpinnerValueFactory
+                        .IntegerSpinnerValueFactory(
+                        1,
+                        1000,
+                        1
+                )
+        );
+
+        mengenSpinner.setEditable(true);
+
+        /*
+         * Bestand erhöhen.
+         */
+        bestandErhoehenButton =
+                new Button(
+                        "Bestand erhöhen"
+                );
+
+        bestandErhoehenButton
+                .getStyleClass()
+                .add("erfolgsbutton");
+
+        /*
+         * Bestand verringern.
+         */
+        bestandVerringernButton =
+                new Button(
+                        "Bestand verringern"
+                );
+
+        /*
+         * Bereich für die Bestandspflege.
+         */
+        HBox bestandBereich =
+                new HBox(
+                        10,
+                        new Label("Menge:"),
+                        mengenSpinner,
+                        bestandErhoehenButton,
+                        bestandVerringernButton
+                );
+
+        bestandBereich.setAlignment(
+                Pos.CENTER_LEFT
+        );
 
         /*
          * Inhaltsbereich.
@@ -212,7 +378,9 @@ public class Lager {
                 new VBox(
                         15,
                         tabellenTitel,
-                        lagerTabelle
+                        lagerTabelle,
+                        bestandTitel,
+                        bestandBereich
                 );
 
         inhaltsBereich.setPadding(
@@ -222,7 +390,8 @@ public class Lager {
         inhaltsBereich.setFillWidth(true);
 
         /*
-         * Tabelle füllt den übrigen Bildschirmbereich.
+         * Tabelle füllt den übrigen
+         * Bildschirmbereich.
          */
         VBox.setVgrow(
                 lagerTabelle,
@@ -232,12 +401,19 @@ public class Lager {
         /*
          * Layout zusammensetzen.
          */
-        hauptLayout.setTop(kopfbereich);
-        hauptLayout.setCenter(inhaltsBereich);
+        hauptLayout.setTop(
+                kopfbereich
+        );
+
+        hauptLayout.setCenter(
+                inhaltsBereich
+        );
     }
 
     /**
      * Gibt die vollständige Ansicht zurück.
+     *
+     * @return Lageransicht
      */
     public Parent getAnsicht() {
         return hauptLayout;
@@ -245,6 +421,8 @@ public class Lager {
 
     /**
      * Gibt den Zurück-Button zurück.
+     *
+     * @return Zurück-Button
      */
     public Button getZurueckButton() {
         return zurueckButton;
@@ -252,9 +430,40 @@ public class Lager {
 
     /**
      * Gibt die Lagertabelle zurück.
+     *
+     * @return Tabelle mit Lagerartikeln
      */
-    public TableView<Object> getLagerTabelle() {
+    public TableView<Lagerartikel>
+    getLagerTabelle() {
         return lagerTabelle;
     }
-}
 
+    /**
+     * Gibt den Mengen-Spinner zurück.
+     *
+     * @return Mengenauswahl
+     */
+    public Spinner<Integer> getMengenSpinner() {
+        return mengenSpinner;
+    }
+
+    /**
+     * Gibt den Button zum Erhöhen
+     * des Lagerbestands zurück.
+     *
+     * @return Bestand-erhöhen-Button
+     */
+    public Button getBestandErhoehenButton() {
+        return bestandErhoehenButton;
+    }
+
+    /**
+     * Gibt den Button zum Verringern
+     * des Lagerbestands zurück.
+     *
+     * @return Bestand-verringern-Button
+     */
+    public Button getBestandVerringernButton() {
+        return bestandVerringernButton;
+    }
+}
