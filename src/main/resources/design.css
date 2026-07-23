@@ -134,3 +134,31 @@
     -fx-background-color: #ffe4e4;
     -fx-text-fill: #9b1c1c;
 }
+
+/*
+ * Warnfarbe für Materialien,
+ * deren Mindestbestand unterschritten wurde.
+ */
+.table-row-cell.lager-warnung {
+    -fx-background-color: #ffd6d6;
+}
+
+/*
+ * Auch die einzelnen Tabellenzellen einfärben.
+ * Dadurch wird verhindert, dass vorhandene
+ * Tabellenstile die Zeilenfarbe überdecken.
+ */
+.table-row-cell.lager-warnung .table-cell {
+    -fx-background-color: #ffd6d6;
+    -fx-text-fill: #9b1c1c;
+    -fx-font-weight: bold;
+}
+
+/*
+ * Markierte Warnzeile etwas dunkler darstellen.
+ */
+.table-row-cell.lager-warnung:selected,
+.table-row-cell.lager-warnung:selected .table-cell {
+    -fx-background-color: #ef9a9a;
+    -fx-text-fill: #7f1d1d;
+}

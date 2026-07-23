@@ -17,7 +17,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import model.Lagerartikel;
-
+import javafx.scene.control.TableRow;
 /**
  * Benutzeroberfläche der Lagerübersicht.
  *
@@ -176,7 +176,52 @@ public class Lager {
                 TableView
                         .CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );
+/*
+ * Markiert Materialien,
+ * deren Bestand den Mindestbestand
+ * unterschreitet.
+ */
+/*
+ * Markiert Materialien optisch,
+ * deren Bestand unter dem Mindestbestand liegt.
+ */
+lagerTabelle.setRowFactory(
+        tabelle -> new TableRow<>() {
 
+            @Override
+            protected void updateItem(
+                    Lagerartikel artikel,
+                    boolean leer
+            ) {
+
+                super.updateItem(
+                        artikel,
+                        leer
+                );
+
+                /*
+                 * Die Klasse zunächst entfernen,
+                 * da JavaFX Tabellenzeilen wiederverwendet.
+                 */
+                getStyleClass().remove(
+                        "lager-warnung"
+                );
+
+                if (!leer
+                        && artikel != null
+                        && artikel.getBestand()
+                        < artikel.getMindestbestand()) {
+
+                    /*
+                     * CSS-Klasse für kritischen Bestand setzen.
+                     */
+                    getStyleClass().add(
+                            "lager-warnung"
+                    );
+                }
+            }
+        }
+);
         /*
          * Spalte: Artikelnummer.
          */
